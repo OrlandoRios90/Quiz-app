@@ -10,9 +10,8 @@ function App() {
   return (
     <>
       <div id="header-container">
-            <h1>Current Score</h1>
+            <h1>Quiz app</h1>
             <h3>{numCorrect} out of {questionsAnswered} answered correctly</h3>
-            <h4>[9] questions left</h4>
         </div>
       <Questions numCorrect={numCorrect} 
                  setNumCorrect={setNumCorrect}
