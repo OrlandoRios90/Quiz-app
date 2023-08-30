@@ -6,6 +6,7 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
     const [n, setN] = useState(0); //this will be used to keep track of the question list index
     const [currAnswer, setCurrAnswer] = useState("");
     const [answerCorrect, setAnswerCorrect] = useState(2);
+    const [buttonDisabled, setButtonDisabled] = useState(false); //this will enable and disable the submit button
     
     //list of the questions
     const questions = [
@@ -21,8 +22,8 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
         {
             name: "question-2",
             number : "2",
-            prompt: "Correct answer",
-            labelA: "First answer 2",
+            prompt: "This is question 2",
+            labelA: "Correct answer",
             labelB: "Second answer 2",
             labelC: "Third answer 2",
             correctAnswer: "a"
@@ -48,8 +49,8 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
         {
             name: "question-5",
             number : "5",
-            prompt: "Correct answer",
-            labelA: "First answer 5",
+            prompt: "This is question 5",
+            labelA: "Correct answer",
             labelB: "Second answer 5",
             labelC: "Third answer 5",
             correctAnswer: "a"
@@ -65,24 +66,26 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
         },
     ]
 
-
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
       }
-
+    
     const handleAnswer = () => {
         
         //wait 2 seconds before advancing to the next question
-        sleep(2000).then(() => { setN(n+1); 
+        sleep(2000).then(() => { 
+                                 if (n < questions.length - 1) {
+                                    setN(n+1); 
+                                 }
                                  setAnswerCorrect(2);
-                                 //need to add code to disable the submit button during this time
+                                 setButtonDisabled(false); //re enable button after the delay
                             });
 
+        setButtonDisabled(true); //disable button until next question loads
         
-        //if the correct answer is selected then add one to number correct
         let addOne = 0;
         if (currAnswer === questions[n].correctAnswer) {
-            addOne = 1;
+            addOne = 1; //if the correct answer is selected then add one to number correct
             setAnswerCorrect(1);
         } else {
             setAnswerCorrect(0);
@@ -91,7 +94,6 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
         setNumCorrect(numCorrect + addOne);
         setQuestionsAnswered(questionsAnswered + 1);
     }
-
     
     const handleChange = (e) => {
         setCurrAnswer(e.target.value);
@@ -110,7 +112,7 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
                 <input type="radio" id="c" name={questions[n].name} value="c" onChange={handleChange}/>
                 <label for="c">{questions[n].labelC}</label>
             </form>
-            <button type="submit" onClick={handleAnswer}>Submit</button>
+            <button type="submit" onClick={handleAnswer} disabled={buttonDisabled}>Submit</button>
             <div>
                 {answerCorrect === 0 ? <h1 id="incorrect-answer">Incorrect</h1> : null}
                 {answerCorrect === 1 ? <h1 id="correct-answer">Correct!</h1> : null}
