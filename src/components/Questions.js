@@ -7,7 +7,9 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
     const [currAnswer, setCurrAnswer] = useState("");
     const [answerCorrect, setAnswerCorrect] = useState(2);
     const [buttonDisabled, setButtonDisabled] = useState(false); //this will enable and disable the submit button
-    
+    const [quizComplete, setQuizComplete] = useState(false);
+    const [pc, setPc] = useState(0);
+
     //list of the questions
     const questions = [
         {
@@ -72,10 +74,14 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
     
     const handleAnswer = () => {
         
+        let lastQ = 0; //will be 1 after last question is answered
+
         //wait 2 seconds before advancing to the next question
         sleep(2000).then(() => { 
                                  if (n < questions.length - 1) {
                                     setN(n+1); 
+                                 } else {
+                                    lastQ = 1; //last question was answered
                                  }
                                  setAnswerCorrect(2);
                                  setButtonDisabled(false); //re enable button after the delay
@@ -93,15 +99,31 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
 
         setNumCorrect(numCorrect + addOne);
         setQuestionsAnswered(questionsAnswered + 1);
+        
+        //wait a little bit after the above sleep function before checking lastQ was answered
+        sleep(2100).then(() => {
+            if (lastQ) {
+            showResults();
+            }
+        });
     }
     
     const handleChange = (e) => {
         setCurrAnswer(e.target.value);
     }
 
+    //last question was answsered so remove the form and display the results
+    const showResults = () => {
+        document.getElementById("quiz-form").remove();
+        document.getElementById("submit-button").remove();
+        setQuizComplete(true);
+        const percentCorrect = numCorrect / questionsAnswered * 100; //*
+        setPc(percentCorrect);
+    }
+
     return (
         <div id="questions-container">
-            <form action="">
+            <form action="" id="quiz-form">
                 <h4>{questions.length - n} questions left</h4>
                 <h3>Question {questions[n].number}</h3>
                 <p>{questions[n].prompt}</p>
@@ -112,10 +134,11 @@ function Questions ({numCorrect, setNumCorrect, questionsAnswered, setQuestionsA
                 <input type="radio" id="c" name={questions[n].name} value="c" onChange={handleChange}/>
                 <label for="c">{questions[n].labelC}</label>
             </form>
-            <button type="submit" onClick={handleAnswer} disabled={buttonDisabled}>Submit</button>
+            <button type="submit" onClick={handleAnswer} disabled={buttonDisabled} id="submit-button">Submit</button>
             <div>
                 {answerCorrect === 0 ? <h1 id="incorrect-answer">Incorrect</h1> : null}
                 {answerCorrect === 1 ? <h1 id="correct-answer">Correct!</h1> : null}
+                {quizComplete ? <h1>You got a {pc}%</h1> : null}
             </div>
         </div>
     )
